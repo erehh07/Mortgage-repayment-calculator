@@ -1,155 +1,185 @@
+// ── Element References ──────────────────────────────────────────────────────
+const inpAmount   = document.getElementById('inp-amount');
+const inpTerm     = document.getElementById('inp-term');
+const inpRate     = document.getElementById('inp-rate');
+const errAmount   = document.getElementById('err-amount');
+const errTerm     = document.getElementById('err-term');
+const errRate     = document.getElementById('err-rate');
+const errType     = document.getElementById('err-type');
+const lblRepay    = document.getElementById('lbl-repayment');
+const lblInter    = document.getElementById('lbl-interest');
+const optRepay    = document.getElementById('opt-repayment');
+const optInter    = document.getElementById('opt-interest');
+const outMonthly  = document.getElementById('outMonthly');
+const outTotal    = document.getElementById('outTotal');
+const stateEmpty  = document.getElementById('stateEmpty');
+const stateResults= document.getElementById('stateResults');
+const btnCalc     = document.getElementById('btnCalc');
+const btnClear    = document.getElementById('btnClear');
 
-const calculateButton = document.querySelector(".calculate-button");
-const mortgageAmountInput = document.querySelector("#mortgage-amount-input");
-const mortgageTermInput = document.querySelector("#mortgage-term-input");
-const interestRateInput = document.querySelector("#interest-rate-input");
-const repaymentOption = document.querySelector("#repayment-option");
-const interestOnlyOption = document.querySelector("#interest-only-option");
-const clearButton = document.querySelector(".clear-button");
-const errorMessages = document.querySelectorAll(".error-msg");
-const symbolElements = document.querySelectorAll(".symbol-background");
-const inputElements = document.querySelectorAll("input");
-const repaymentLabel = document.querySelector(".repayment-label");
-const interestOnlyLabel = document.querySelector(".interestonly-label");
-const resultHeader = document.querySelector(".results-header");
-const resultDetails = document.querySelector(".results-details");
-const labelAmount = document.querySelectorAll(".label-amount");
+// ── Helpers ──────────────────────────────────────────────────────────────────
 
-function showError(index, msg) {
-  errorMessages[index].textContent = msg;
-  inputElements[index].classList.add("error-border");
-  symbolElements[index].classList.add("error-background");
+/**
+ * Format a number as GBP currency string.
+ * @param {number} n
+ * @returns {string}
+ */
+function formatCurrency(n) {
+  return new Intl.NumberFormat('en-GB', {
+    style: 'currency',
+    currency: 'GBP',
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(n);
 }
 
-function hideError(index, msg) {
-  errorMessages[index].textContent = msg;
-  inputElements[index].classList.remove("error-border");
-  symbolElements[index].classList.remove("error-background");
-}
-
-function validInput(input, index) {
-  if (input === "") {
-    showError(index, "This Field is required");
+/**
+ * Show or clear an error state on an input + its message element.
+ * @param {HTMLInputElement} input
+ * @param {HTMLElement} errEl
+ * @param {string|null} msg  - Pass null/empty to clear the error.
+ */
+function setError(input, errEl, msg) {
+  errEl.textContent = msg || '';
+  if (msg) {
+    input.classList.add('error');
   } else {
-    hideError(index, null);
-    return +input;
+    input.classList.remove('error');
   }
 }
 
-const formatNumber = (number) =>
-  Intl.NumberFormat("en-UK", {
-    style: "currency",
-    currency: "GBP",
-  }).format(number);
+// ── Validation ───────────────────────────────────────────────────────────────
 
-function checkRadioButton() {
-  const repayment = repaymentOption.checked;
-  const interestOnly = interestOnlyOption.checked;
-  let option = null;
+/**
+ * Validate all form inputs.
+ * @returns {{ amount: number, term: number, rate: number, type: string }|null}
+ *   Returns parsed values on success, or null if any field is invalid.
+ */
+function validate() {
+  let valid = true;
 
-  if (repayment === true && interestOnly === false) {
-    option = "repayment";
-    return option;
-  } else if (interestOnly === true && repayment === false) {
-    option = "interestOnly";
-    return option;
+  const amount = parseFloat(inpAmount.value);
+  const term   = parseFloat(inpTerm.value);
+  const rate   = parseFloat(inpRate.value);
+  const type   = document.querySelector('input[name="mortgage-type"]:checked')?.value;
+
+  if (!inpAmount.value || isNaN(amount) || amount <= 0) {
+    setError(inpAmount, errAmount, 'This field is required');
+    valid = false;
   } else {
-    return (errorMessages[3].textContent = "This Field is required");
+    setError(inpAmount, errAmount, null);
   }
-}
 
-function calculateRepayment() {
-  const mortgageAmount = validInput(mortgageAmountInput.value, 0);
-  const mortgageTerm = validInput(mortgageTermInput.value, 1);
-  const mortgageInterest = validInput(interestRateInput.value, 2);
-  const isRadioButtonChecked = checkRadioButton();
-
-  if (mortgageAmount && mortgageTerm && mortgageInterest) {
-    if (isRadioButtonChecked === "repayment") {
-      //Convert annual Interest Rate to monthly interest
-      const monthlyInterest = mortgageInterest / 100 / 12;
-      //Calculate number of payment
-      const numberOfPayment = mortgageTerm * 12;
-      //Calculate (1+r)n
-      const onePlusPowerN = Math.pow(1 + monthlyInterest, numberOfPayment);
-      //Calculate Monthly Mortgage payment
-      const monthly =
-        (mortgageAmount * (monthlyInterest * onePlusPowerN)) /
-        (onePlusPowerN - 1);
-      //Calculate Total repayment
-      const totalRepayment = monthly * numberOfPayment;
-      //Round it to two decimal and format Into Currency
-      const monthlyRepayment = formatNumber(monthly);
-      const totalRepaymentRounded = formatNumber(totalRepayment);
-
-      resultHeader.classList.add("hide");
-      resultDetails.classList.add("show");
-      labelAmount[0].textContent = monthlyRepayment;
-      labelAmount[1].textContent = totalRepaymentRounded;
-    } else if (isRadioButtonChecked === "interestOnly") {
-      //Convert annual Interest Rate to monthly interest
-      const monthlyInterest = mortgageInterest / 100 / 12;
-      //Calculate monthly Interest payment
-      const monthlyInterestPayment = mortgageAmount * monthlyInterest;
-      //Total Interest Payment overLoan Term
-      const totalInterest = monthlyInterestPayment * mortgageTerm * 12;
-      //Round it to two decimal and format Into Currency
-      const interestPayment = formatNumber(monthlyInterestPayment);
-      const interestPaidOverTerm = formatNumber(totalInterest);
-
-      resultHeader.classList.add("hide");
-      resultDetails.classList.add("show");
-      labelAmount[0].textContent = interestPayment;
-      labelAmount[1].textContent = interestPaidOverTerm;
-    } else {
-      return false;
-    }
+  if (!inpTerm.value || isNaN(term) || term <= 0) {
+    setError(inpTerm, errTerm, 'This field is required');
+    valid = false;
   } else {
-    return false;
+    setError(inpTerm, errTerm, null);
   }
+
+  if (!inpRate.value || isNaN(rate) || rate <= 0) {
+    setError(inpRate, errRate, 'This field is required');
+    valid = false;
+  } else {
+    setError(inpRate, errRate, null);
+  }
+
+  if (!type) {
+    errType.textContent = 'This field is required';
+    valid = false;
+  } else {
+    errType.textContent = '';
+  }
+
+  return valid ? { amount, term, rate, type } : null;
 }
 
-function handleClearAllButton() {
-  resultHeader.classList.remove("hide");
-  resultDetails.classList.remove("show");
-  inputElements.forEach(
-    (element) => ((element.checked = false), (element.value = null))
-  );
-  repaymentLabel.classList.remove("select");
-  interestOnlyLabel.classList.remove("select");
-  labelAmount[0].textContent = null;
-  labelAmount[1].textContent = null;
-  errorMessages.forEach((element) => (element.textContent = null));
-  inputElements.forEach((element) => element.classList.remove("error-border"));
-  symbolElements.forEach((element) =>
-    element.classList.remove("error-background")
-  );
+// ── Calculations ─────────────────────────────────────────────────────────────
+
+/**
+ * Calculate monthly and total repayment for a standard repayment mortgage.
+ * Uses the standard amortisation formula:
+ *   M = P * [r(1+r)^n] / [(1+r)^n - 1]
+ */
+function calcRepayment(amount, term, annualRate) {
+  const r   = annualRate / 100 / 12;       // monthly rate
+  const n   = term * 12;                   // total number of payments
+  const pow = Math.pow(1 + r, n);
+  const monthly = (amount * r * pow) / (pow - 1);
+  return { monthly, total: monthly * n };
 }
 
-clearButton.addEventListener("click", handleClearAllButton);
+/**
+ * Calculate monthly and total repayment for an interest-only mortgage.
+ * Monthly payment = principal × monthly rate (capital is not repaid monthly).
+ */
+function calcInterestOnly(amount, term, annualRate) {
+  const r       = annualRate / 100 / 12;
+  const monthly = amount * r;
+  return { monthly, total: monthly * term * 12 };
+}
 
-calculateButton.addEventListener("click", function (e) {
-  e.preventDefault();
-  calculateRepayment();
+// ── Main Actions ─────────────────────────────────────────────────────────────
+
+function calculate() {
+  const data = validate();
+  if (!data) return;
+
+  const { amount, term, rate, type } = data;
+  const result =
+    type === 'repayment'
+      ? calcRepayment(amount, term, rate)
+      : calcInterestOnly(amount, term, rate);
+
+  outMonthly.textContent = formatCurrency(result.monthly);
+  outTotal.textContent   = formatCurrency(result.total);
+
+  stateEmpty.style.display = 'none';
+  stateResults.classList.add('visible');
+}
+
+function clearAll() {
+  // Reset inputs
+  inpAmount.value = '';
+  inpTerm.value   = '';
+  inpRate.value   = '';
+
+  // Reset radio buttons and their highlight classes
+  optRepay.checked = false;
+  optInter.checked = false;
+  lblRepay.classList.remove('selected');
+  lblInter.classList.remove('selected');
+
+  // Clear all error states
+  setError(inpAmount, errAmount, null);
+  setError(inpTerm,   errTerm,   null);
+  setError(inpRate,   errRate,   null);
+  errType.textContent = '';
+
+  // Reset results panel to empty state
+  stateEmpty.style.display = '';
+  stateResults.classList.remove('visible');
+}
+
+// ── Event Listeners ──────────────────────────────────────────────────────────
+
+btnCalc.addEventListener('click', calculate);
+btnClear.addEventListener('click', clearAll);
+
+// Radio button selection highlight
+optRepay.addEventListener('change', function () {
+  lblRepay.classList.add('selected');
+  lblInter.classList.remove('selected');
+  errType.textContent = '';
 });
 
-mortgageAmountInput.addEventListener("focus", function () {
-  hideError(0, null);
+optInter.addEventListener('change', function () {
+  lblInter.classList.add('selected');
+  lblRepay.classList.remove('selected');
+  errType.textContent = '';
 });
 
-mortgageTermInput.addEventListener("focus", function () {
-  hideError(1, null);
-});
-interestRateInput.addEventListener("focus", function () {
-  hideError(2, null);
-});
-repaymentOption.addEventListener("click", function () {
-  repaymentLabel.classList.add("select");
-  interestOnlyLabel.classList.remove("select");
-  errorMessages[3].textContent = null;
-});
-interestOnlyOption.addEventListener("click", function () {
-  repaymentLabel.classList.remove("select");
-  interestOnlyLabel.classList.add("select");
-  errorMessages[3].textContent = null;
-});
+// Clear individual field errors on focus
+inpAmount.addEventListener('focus', () => setError(inpAmount, errAmount, null));
+inpTerm.addEventListener('focus',   () => setError(inpTerm,   errTerm,   null));
+inpRate.addEventListener('focus',   () => setError(inpRate,   errRate,   null));
