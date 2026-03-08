@@ -1,405 +1,380 @@
-@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap");
 
-* {
+/* ── RESET & BASE ── */
+*, *::before, *::after {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  font-family: "Plus Jakarta Sans", sans-serif;
 }
 
 :root {
-  --Lime: hsl(61, 70%, 52%);
-  --Red: hsl(4, 69%, 50%);
-
-  --White: hsl(0, 0%, 100%);
-  --Slate100: hsl(202, 86%, 94%);
-  --Slate300: hsl(203, 41%, 72%);
-  --Slate500: hsl(200, 26%, 54%);
-  --Slate700: hsl(200, 24%, 40%);
-  --Slate900: hsl(202, 55%, 16%);
+  --lime:        hsl(61, 70%, 52%);
+  --lime-light:  hsla(61, 70%, 52%, 0.18);
+  --red:         hsl(4, 69%, 50%);
+  --white:       hsl(0, 0%, 100%);
+  --slate-100:   hsl(202, 86%, 94%);
+  --slate-300:   hsl(203, 41%, 72%);
+  --slate-500:   hsl(200, 26%, 54%);
+  --slate-700:   hsl(200, 24%, 40%);
+  --slate-900:   hsl(202, 55%, 16%);
+  --result-bg:   hsl(202, 55%, 11%);
 }
 
 body {
-  background-color: var(--Slate100);
-}
-
-.container {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background-color: var(--slate-100);
+  min-height: 100vh;
   display: flex;
-  background-color: var(--White);
-  border-radius: 20px;
-  width: 63em;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
 }
 
-.details-container {
+/* ── CARD ── */
+.card {
+  display: flex;
+  width: min(63rem, 100%);
+  background: var(--white);
+  border-radius: 1.5rem;
+  overflow: hidden;
+  box-shadow: 0 24px 60px hsla(202, 55%, 16%, 0.12);
+}
+
+/* ── LEFT PANEL ── */
+.panel-left {
   width: 50%;
   padding: 2.5rem;
 }
 
-.header-container {
+.panel-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
   margin-bottom: 2.2rem;
 }
 
-h1 {
-  color: var(--Slate900);
+.panel-header h1 {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--slate-900);
 }
 
-.clear-button {
-  text-decoration: underline;
-  font-size: 0.95em;
-  color: var(--Slate700);
-  letter-spacing: 1px;
-  cursor: pointer;
-  background-color: transparent;
+.btn-clear {
+  background: none;
   border: none;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--slate-500);
+  text-decoration: underline;
+  cursor: pointer;
+  transition: color 0.2s;
 }
+.btn-clear:hover { color: var(--slate-900); }
 
-.amount {
+/* ── FIELDS ── */
+.field {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  position: relative;
+  gap: 0.6rem;
+  margin-bottom: 1.5rem;
 }
 
-.amount > label,
-.term-container > label,
-.interest-container > label,
-.type-container > label {
-  color: var(--Slate700);
-  font-size: 0.95em;
+.field label,
+.type-label {
+  font-size: 0.875rem;
   font-weight: 500;
+  color: var(--slate-700);
 }
 
-#mortgage-amount-input,
-#mortgage-term-input,
-#interest-rate-input {
+.type-label {
+  display: block;
+  margin-bottom: 0.6rem;
+}
+
+.input-wrap {
+  position: relative;
+  display: flex;
+}
+
+.input-wrap input {
   width: 100%;
-  height: 45px;
-  border-radius: 5px;
-  border: 1px solid var(--Slate700);
-  padding: 10px 10px 10px 55px;
+  height: 48px;
+  border: 1.5px solid var(--slate-300);
+  border-radius: 0.4rem;
+  font-family: inherit;
+  font-size: 1rem;
   font-weight: 700;
-  font-size: 1em;
+  color: var(--slate-900);
   cursor: pointer;
+  transition: border-color 0.2s;
+  background: transparent;
+  outline: none;
 }
 
-#mortgage-amount-input:hover,
-#mortgage-term-input:hover,
-#interest-rate-input:hover {
-  border-color: var(--Lime);
-}
+.input-wrap input:hover  { border-color: var(--slate-900); }
+.input-wrap input:focus  { border-color: var(--lime); }
+.input-wrap input.error  { border-color: var(--red) !important; }
 
-.symbol-background {
-  background-color: var(--Slate100);
+/* Padding helpers for badge insets */
+.has-badge-left input          { padding-left: 60px; }
+.has-badge-right input         { padding: 0 64px 0 1rem; }
+.has-badge-left.has-badge-right input { padding: 0 64px 0 60px; }
+
+/* ── BADGES ── */
+.badge {
   position: absolute;
-  height: 43px;
-  top: 30px;
+  top: 1.5px;
+  height: calc(100% - 3px);
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 600;
-  color: var(--Slate700);
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--slate-700);
+  background: var(--slate-100);
+  pointer-events: none;
+  user-select: none;
+  transition: background 0.2s, color 0.2s;
 }
 
-.pound-symbol {
-  width: 40px;
-  border-radius: 5px 0 0 5px;
-  left: 1px;
+.badge-left {
+  left: 1.5px;
+  width: 48px;
+  border-radius: 0.3rem 0 0 0.3rem;
 }
 
-.year-symbol {
-  right: 1px;
-  width: 75px;
-  border-radius: 0 5px 5px 0px;
+.badge-right {
+  right: 1.5px;
+  padding: 0 14px;
+  border-radius: 0 0.3rem 0.3rem 0;
 }
 
-.percent-symbol {
-  right: 1px;
-  border-radius: 0 5px 5px 0px;
-  width: 40px;
+/* Highlight badge on hover / focus */
+.input-wrap:hover .badge,
+.input-wrap input:focus ~ .badge {
+  background: var(--lime);
+  color: var(--slate-900);
 }
 
-.term-interest-container {
+/* Error badge colour */
+.input-wrap input.error ~ .badge {
+  background: var(--red);
+  color: var(--white);
+}
+
+/* ── TWO-COL ROW ── */
+.row-two {
   display: flex;
-  align-items: center;
-  gap: 25px;
-  margin-top: 2.2rem;
+  gap: 1.5rem;
+}
+.row-two .field { flex: 1; }
+
+/* ── RADIO OPTIONS ── */
+.field-group {
+  margin-bottom: 1.5rem;
 }
 
-.term-container,
-.interest-container {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  position: relative;
-}
-
-#mortgage-term-input,
-#interest-rate-input {
-  padding: 15px;
-}
-
-#mortgage-amount-input:hover + .symbol-background,
-#mortgage-term-input:hover + .symbol-background,
-#interest-rate-input:hover + .symbol-background {
-  background-color: var(--Lime);
-}
-
-#mortgage-amount-input:focus-visible + .symbol-background,
-#mortgage-term-input:focus-visible + .symbol-background,
-#interest-rate-input:focus-visible + .symbol-background {
-  background-color: var(--Lime);
-}
-
-#mortgage-amount-input:focus-visible,
-#mortgage-term-input:focus-visible,
-#interest-rate-input:focus-visible {
-  outline-color: var(--Lime);
-}
-
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-.type-container {
-  margin-top: 2.2rem;
+.radio-options {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 0.75rem;
 }
 
-.option {
-  width: 100%;
+.radio-option {
   display: flex;
   align-items: center;
-  gap: 15px;
-  padding: 12px;
-  border: 1px solid var(--Slate700);
+  gap: 0.9rem;
+  padding: 0.85rem 1rem;
+  border: 1.5px solid var(--slate-300);
+  border-radius: 0.4rem;
   cursor: pointer;
-  border-radius: 5px;
-  font-weight: 700 !important;
-  color: var(--Slate900) !important;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--slate-900);
+  transition: border-color 0.2s, background 0.2s;
+  user-select: none;
 }
 
-.option:hover {
-  background-color: hsla(61, 70%, 52%, 0.213);
-  border-color: var(--Lime);
+.radio-option:hover {
+  border-color: var(--lime);
+  background: var(--lime-light);
 }
 
-#interest-only-option,
-#repayment-option {
+.radio-option.selected {
+  border-color: var(--lime);
+  background: var(--lime-light);
+}
+
+.radio-option input[type="radio"] {
   width: 20px;
   height: 20px;
-}
-
-input[type="radio"] {
-  accent-color: var(--Lime);
-}
-.calculate-button {
-  margin-top: 2.2rem;
-  width: 300px;
-  padding: 15px;
-  border-radius: 50px;
-  border: none;
-  background-color: var(--Lime);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 15px;
+  accent-color: var(--lime);
+  flex-shrink: 0;
   cursor: pointer;
 }
 
-.calculate-button > span {
-  font-size: 1.2em;
+/* ── ERROR MESSAGES ── */
+.error-msg {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--red);
+  min-height: 1rem;
+  display: block;
+  margin-top: 0.25rem;
+}
+
+/* ── CALCULATE BUTTON ── */
+.btn-calc {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 300px;
+  margin-top: 2rem;
+  padding: 1rem 1.5rem;
+  background: var(--lime);
+  border: none;
+  border-radius: 3rem;
+  font-family: inherit;
+  font-size: 1rem;
   font-weight: 700;
-  color: var(--Slate900);
+  color: var(--slate-900);
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s;
 }
+.btn-calc:hover  { background: hsl(61, 70%, 62%); transform: translateY(-1px); }
+.btn-calc:active { transform: translateY(0); }
 
-.results-container {
+/* ── RIGHT PANEL ── */
+.panel-right {
   width: 50%;
-  background-color: var(--Slate900);
-  border-radius: 0px 20px 20px 80px;
-}
-
-.results-header {
-  height: 100%;
+  background: var(--slate-900);
+  border-radius: 0 1.5rem 1.5rem 5rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-}
-
-.results-header > h2 {
-  color: var(--White);
-  margin: 15px;
-}
-
-.desc {
-  text-align: center;
-  padding-inline: 25px;
-  color: var(--Slate500);
-}
-
-.results-details {
-  display: none;
-  position: absolute;
-  top: 0;
   padding: 2.5rem;
+  position: relative;
+  min-height: 400px;
 }
 
-.results-details > h2 {
-  margin-bottom: 1rem;
-  color: var(--White);
-  font-size: 1.45em;
+/* ── EMPTY STATE ── */
+.state-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  text-align: center;
 }
 
-.results-details > p {
-  color: var(--Slate500);
+.state-empty h2 {
+  color: var(--white);
+  font-size: 1.3rem;
 }
 
-.results-summary {
-  margin-top: 2rem;
-  background-color: #0e2431;
-  padding: 2rem;
-  border-radius: 10px;
-  border-top: 5px solid var(--Lime);
+.state-empty p {
+  color: var(--slate-500);
+  font-size: 0.9rem;
+  max-width: 22ch;
+  line-height: 1.6;
 }
 
-.results-summary > p {
-  color: var(--Slate500);
-}
-
-.monthly-repayment {
-  font-size: 3.2em;
-  margin: 25px 0;
-  color: var(--Lime);
-}
-
-hr {
-  border: 1px solid var(--Slate700);
-  margin-bottom: 2rem;
-}
-
-.total-repayment {
-  font-size: 1.8em;
-  margin: 10px 0;
-  color: var(--White);
-}
-
-.error-msg {
-  color: var(--Red);
-  font-weight: 600;
-  font-size: 0.8em;
-}
-
-.show {
-  display: block;
-}
-
-.hide {
+/* ── RESULTS STATE ── */
+.state-results {
   display: none;
+  width: 100%;
+  animation: fadeIn 0.35s ease;
 }
 
-.error-background {
-  background-color: var(--Red);
-  color: var(--White);
+.state-results.visible { display: block; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-.error-border {
-  border-color: var(--Red) !important;
+.state-results h2 {
+  color: var(--white);
+  font-size: 1.35rem;
+  margin-bottom: 0.75rem;
 }
 
-.select {
-  background-color: hsla(61, 70%, 52%, 0.213);
-  border-color: var(--Lime) !important;
+.state-results > p {
+  color: var(--slate-500);
+  font-size: 0.875rem;
+  line-height: 1.6;
+  margin-bottom: 1.75rem;
 }
 
-@media screen and (max-width: 1024px) {
-  .container {
-    width: 55em;
-  }
+.results-box {
+  background: var(--result-bg);
+  border-top: 4px solid var(--lime);
+  border-radius: 0.75rem;
+  padding: 1.75rem;
 }
 
-@media screen and (max-width: 800px) {
-  section {
-    padding: 1rem 0;
-  }
-  .container {
-    position: static;
-    margin: auto;
-    transform: translate(0, 0);
-    height: 100%;
-    width: 90%;
-    display: flex;
+.result-row { margin-bottom: 1.5rem; }
+
+.result-label {
+  font-size: 0.875rem;
+  color: var(--slate-500);
+  margin-bottom: 0.4rem;
+}
+
+.result-monthly {
+  font-size: clamp(2rem, 4vw, 3rem);
+  font-weight: 800;
+  color: var(--lime);
+  line-height: 1;
+}
+
+.result-divider {
+  border: none;
+  border-top: 1px solid var(--slate-700);
+  margin: 1.25rem 0;
+}
+
+.result-total-amount {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--white);
+  margin-top: 0.35rem;
+}
+
+/* ── HIDE SPINNERS ── */
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; margin: 0; }
+input[type=number] { -moz-appearance: textfield; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 800px) {
+  body { padding: 0; align-items: flex-start; }
+
+  .card {
     flex-direction: column;
-  }
-
-  .details-container {
-    width: 100%;
-  }
-
-  .term-interest-container {
-    width: 100%;
-  }
-
-  .term-container,
-  .interest-container {
-    width: 100%;
-  }
-
-  .results-container {
-    width: 100%;
-    background-color: var(--Slate900);
-    border-radius: 0px 0px 20px 20px;
-    padding: 2rem;
-  }
-
-  .results-details {
-    position: static;
-    padding: 0;
-  }
-}
-
-@media screen and (max-width: 500px) {
-  section {
-    padding: 0rem 0;
-  }
-  h1 {
-    font-size: 1.4em;
-  }
-  .container {
     width: 100%;
     border-radius: 0;
+    box-shadow: none;
   }
 
-  .header-container {
-    flex-wrap: wrap;
-    gap: 8px;
+  .panel-left  { width: 100%; }
+
+  .panel-right {
+    width: 100%;
+    border-radius: 0;
+    min-height: 320px;
   }
 
-  .details-container {
-    padding: 1.5rem;
-  }
-  .term-interest-container {
-    flex-direction: column;
-  }
-  .results-container {
-    border-radius: 0px;
-  }
+  .btn-calc { max-width: 100%; }
+}
 
-  .desc {
-    padding-inline: 0px;
-  }
-  .calculate-button {
-    margin-inline: auto;
-    width: 80%;
-  }
+@media (max-width: 500px) {
+  .panel-left  { padding: 1.5rem; }
+  .panel-right { padding: 1.5rem 1.5rem 2.5rem; }
+  .row-two     { flex-direction: column; gap: 0; }
+  .panel-header h1 { font-size: 1.2rem; }
 }
